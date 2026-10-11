@@ -24,8 +24,4 @@
     <ProjectReference Include="..\TrafficPenaltyManagement.Domain\TrafficPenaltyManagement.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Repositories\" />
-  </ItemGroup>
-
 </Project>

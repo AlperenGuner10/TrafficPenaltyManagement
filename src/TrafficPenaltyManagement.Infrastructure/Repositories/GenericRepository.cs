@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using TrafficPenaltyManagement.Application.Interfaces;
@@ -49,6 +50,11 @@ namespace TrafficPenaltyManagement.Infrastructure.Repositories
 		public void Update(T entity)
 		{
 			 _dbSet.Update(entity);
+		}
+
+		public async Task<bool> ExistAsync(Expression<Func<T, bool>> expression)
+		{
+			return await _dbSet.AnyAsync(expression);
 		}
 	}
 }

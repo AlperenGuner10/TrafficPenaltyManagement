@@ -11,6 +11,8 @@ namespace TrafficPenaltyManagement.Application.Interfaces
 	{
 		Task<List<VehicleDto>> GetAllAsync();
 		Task<VehicleDto?> GetByIdAsync(int id);
-
+		Task<bool> CreateAsync(CreateVehicleDto createVehicleDto);//True: araç kaydedildi, false: Aynı plakaya sahip bir araç var.
+		Task<bool> UpdateAsync(UpdateVehicleDto updateVehicleDto);
+		Task<bool> DeactiveAsync(int id);
 	}
 }

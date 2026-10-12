@@ -1,0 +1,33 @@
+﻿@model TrafficPenaltyManagement.Application.DTOs.VehicleDto
+@using TrafficPenaltyManagement.Domain.Enums
+
+@{
+    ViewData["Title"] = "Araç Detayı";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Araç Detayı</h2>
+
+    <dl class="row">
+        <dt class="col-sm-3">Plaka</dt>
+        <dd class="col-sm-9">@Model.Plate</dd>
+
+        <dt class="col-sm-3">Araç Türü</dt>
+        <dd class="col-sm-9">@Model.VehicleType</dd>
+
+        <dt class="col-sm-3">Marka</dt>
+        <dd class="col-sm-9">@Model.Brand</dd>
+
+        <dt class="col-sm-3">Model</dt>
+        <dd class="col-sm-9">@Model.Model</dd>
+
+        <dt class="col-sm-3">Durum</dt>
+        <dd class="col-sm-9">
+            @(Model.IsActive ? "Aktif" : "Pasif")
+        </dd>
+    </dl>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Araç Listesine Dön
+    </a>
+</div>

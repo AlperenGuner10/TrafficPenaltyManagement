@@ -36,7 +36,7 @@ Uygulamada ASP.NET Core Identity ile kullanıcı girişi ve rol bazlı yetkilend
 | Manager  | mehmet@gmail.com  | Yönetici onayı veya gerekçeli ret                                          |
 | Employee | erhan@gmail.com   | Ceza oluşturma; kendi reddedilen kayıtlarını düzenleme ve yeniden gönderme |
 
-> Hesap şifreleri 123456789Aa-
+> 
 
 ## 5. Teknik Yapı ve İş Kuralları
 

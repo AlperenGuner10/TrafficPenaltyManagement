@@ -11,6 +11,7 @@ namespace TrafficPenaltyManagement.Domain.Enums
 		Submitted = 1,
 		Approved = 2,
 		Rejected = 3,
-		Resubmitted = 4
+		Resubmitted = 4,
+		Updated = 5
 	}
 }

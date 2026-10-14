@@ -1,0 +1,204 @@
+﻿@using TrafficPenaltyManagement.Domain.Enums
+@model TrafficPenaltyManagement.Application.DTOs.TrafficPenaltiesDtos.TrafficPenaltyDetailsDto
+
+@{
+    ViewData["Title"] = "Trafik Cezası Detayı";
+    var penalty = Model.Penalty;
+}
+
+<h2 class="mb-4">Trafik Cezası Detayı</h2>
+
+@if (Model.Penalty.CurrentStatus == PenaltyStatus.Rejected)
+{
+    var lastRejection = Model.ApprovalHistories
+        .Where(h => h.ActionType == ApprovalActionType.Rejected)
+        .OrderByDescending(h => h.CreatedDate)
+        .FirstOrDefault();
+
+    <div class="alert alert-danger">
+        <h5 class="alert-heading">Trafik Cezası Reddedildi</h5>
+
+        @if (lastRejection != null)
+        {
+            <p class="mb-1">
+                <strong>Ret Gerekçesi:</strong>
+                @lastRejection.Description
+            </p>
+
+            <p class="mb-1">
+                <strong>İşlemi Yapan:</strong>
+                @lastRejection.PerformedByFullName
+            </p>
+
+            <small>
+                @lastRejection.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+            </small>
+        }
+        else
+        {
+            <p class="mb-0">
+                Bu ceza reddedilmiş ancak ret gerekçesi bulunamadı.
+            </p>
+        }
+    </div>
+}
+<div class="card mb-4">
+    <div class="card-header">
+        <strong>@penalty.PenaltyNumber</strong>
+    </div>
+
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">Araç Plakası</dt>
+            <dd class="col-sm-9">@penalty.VehiclePlate</dd>
+
+            <dt class="col-sm-3">Ceza Tarihi</dt>
+            <dd class="col-sm-9">
+                @penalty.PenaltyDate.ToString("dd.MM.yyyy")
+            </dd>
+
+            <dt class="col-sm-3">Açıklama</dt>
+            <dd class="col-sm-9">@penalty.Description</dd>
+
+            <dt class="col-sm-3">Tutar</dt>
+            <dd class="col-sm-9">@penalty.Amount.ToString("N2") TL</dd>
+
+            <dt class="col-sm-3">Mevcut Durum</dt>
+            <dd class="col-sm-9">
+                @switch (penalty.CurrentStatus)
+                {
+                    case PenaltyStatus.New:
+                        <span>Yeni</span>
+                        break;
+                    case PenaltyStatus.WaitingForManagerApproval:
+                        <span>Yönetici Onayı Bekliyor</span>
+                        break;
+                    case PenaltyStatus.WaitingForFinanceApproval:
+                        <span>Finans Onayı Bekliyor</span>
+                        break;
+                    case PenaltyStatus.Completed:
+                        <span>Tamamlandı</span>
+                        break;
+                    case PenaltyStatus.Rejected:
+                        <span>Reddedildi</span>
+                        break;
+                }
+            </dd>
+
+            <dt class="col-sm-3">Oluşturulma Tarihi</dt>
+            <dd class="col-sm-9">
+                @penalty.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+            </dd>
+        </dl>
+    </div>
+</div>
+
+<h4 class="mb-3">Onay ve İşlem Geçmişi</h4>
+
+@if (Model.ApprovalHistories.Count == 0)
+{
+    <div class="alert alert-info">
+        Bu ceza için henüz işlem geçmişi bulunmuyor.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Tarih</th>
+                    <th>İşlemi Yapan</th>
+                    <th>İşlem</th>
+                    <th>Önceki Durum</th>
+                    <th>Yeni Durum</th>
+                    <th>Açıklama</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var history in Model.ApprovalHistories)
+                {
+                    <tr>
+                        <td>@history.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@history.PerformedByFullName</td>
+                        <td>
+                            @switch (history.ActionType)
+                            {
+                                case ApprovalActionType.Submitted:
+                                    <span>Onaya Gönderildi</span>
+                                    break;
+                                case ApprovalActionType.Approved:
+                                    <span>Onaylandı</span>
+                                    break;
+                                case ApprovalActionType.Rejected:
+                                    <span>Reddedildi</span>
+                                    break;
+                                case ApprovalActionType.Resubmitted:
+                                    <span>Yeniden Gönderildi</span>
+                                    break;
+                                case ApprovalActionType.Updated:
+                                    <span class="badge bg-info text-dark">
+                                        Güncellendi
+                                    </span>
+                                    break;
+                            }
+                        </td>
+                        <td>@GetStatusText(history.PreviousStatus)</td>
+                        <td>@GetStatusText(history.NewStatus)</td>
+                        <td>@history.Description</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+<a asp-action="Index" class="btn btn-secondary">
+    Listeye Dön
+</a>
+
+@functions {
+    public string GetStatusText(PenaltyStatus status)
+    {
+        return status switch
+        {
+            PenaltyStatus.New => "Yeni",
+            PenaltyStatus.WaitingForManagerApproval => "Yönetici Onayı Bekliyor",
+            PenaltyStatus.WaitingForFinanceApproval => "Finans Onayı Bekliyor",
+            PenaltyStatus.Completed => "Tamamlandı",
+            PenaltyStatus.Rejected => "Reddedildi",
+            _ => status.ToString()
+        };
+    }
+}
+@if (Model.Penalty.CurrentStatus == PenaltyStatus.Rejected &&
+    (User.IsInRole("Admin") ||
+     (User.IsInRole("Employee") &&
+      Model.Penalty.CreatedByUserId ==
+      User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)))
+{
+    <div class="mt-3 d-flex gap-2">
+
+        <a asp-controller="TrafficPenalties"
+           asp-action="Update"
+           asp-route-id="@Model.Penalty.Id"
+           class="btn btn-warning">
+            Cezayı Düzenle
+        </a>
+
+        <form asp-controller="TrafficPenalties"
+              asp-action="Resubmit"
+              asp-route-id="@Model.Penalty.Id"
+              method="post">
+
+            @Html.AntiForgeryToken()
+
+            <button type="submit"
+                    class="btn btn-success"
+                    onclick="return confirm('Cezayı yeniden yönetici onayına göndermek istiyor musunuz?');">
+                Yeniden Onaya Gönder
+            </button>
+        </form>
+
+    </div>
+}

@@ -1,0 +1,82 @@
+﻿@model TrafficPenaltyManagement.Application.DTOs.TrafficPenaltiesDtos.CreateTrafficPenaltyDto
+
+@{
+    ViewData["Title"] = "Yeni Trafik Cezası";
+}
+
+<h2 class="mb-4">Yeni Trafik Cezası</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly"
+         class="text-danger mb-3"></div>
+
+    <div class="mb-3">
+        <label asp-for="VehicleId" class="form-label">
+            Araç Plakası
+        </label>
+
+        <select asp-for="VehicleId"
+                asp-items="ViewBag.ActiveVehicles"
+                class="form-select">
+            <option value="">Araç seçiniz</option>
+        </select>
+
+        <span asp-validation-for="VehicleId"
+              class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="PenaltyDate" class="form-label">
+            Ceza Tarihi
+        </label>
+
+        <input asp-for="PenaltyDate"
+               type="date"
+               class="form-control" />
+
+        <span asp-validation-for="PenaltyDate"
+              class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">
+            Açıklama
+        </label>
+
+        <textarea asp-for="Description"
+                  class="form-control"
+                  rows="4"
+                  maxlength="1000"></textarea>
+
+        <span asp-validation-for="Description"
+              class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Amount" class="form-label">
+            Ceza Tutarı (TL)
+        </label>
+
+        <input asp-for="Amount"
+               type="number"
+               step="0.01"
+               class="form-control" />
+
+        <span asp-validation-for="Amount"
+              class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Kaydet ve Onaya Gönder
+    </button>
+
+    <a asp-action="Index" class="btn btn-secondary">
+        Vazgeç
+    </a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

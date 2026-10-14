@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using TrafficPenaltyManagement.Application.Interfaces;
+using TrafficPenaltyManagement.Application.Services;
 using TrafficPenaltyManagement.Infrastructure.Identity;
 using TrafficPenaltyManagement.Infrastructure.Persistence;
 using TrafficPenaltyManagement.Infrastructure.Repositories;
@@ -28,11 +29,12 @@ builder.Services
 		options.Password.RequireNonAlphanumeric = false;
 	})
 	.AddRoles<IdentityRole>()
-	.AddEntityFrameworkStores<ApplicationDbContext>();
+	.AddEntityFrameworkStores<ApplicationDbContext>()
+	.AddErrorDescriber<TurkishIdentityErrorDescriber>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IVehicleService, VehicleService>();
-
+builder.Services.AddScoped<ITrafficPenaltyService, TrafficPenaltyService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -51,8 +53,42 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+using (var scope = app.Services.CreateScope())
+{
+	var roleManager = scope.ServiceProvider
+		.GetRequiredService<RoleManager<IdentityRole>>();
+
+	string[] roles =
+	{
+		"Employee",
+		"Manager",
+		"Finance",
+		"Admin"
+	};
+
+	foreach (var role in roles)
+	{
+		if (!await roleManager.RoleExistsAsync(role))
+		{
+			var result = await roleManager.CreateAsync(
+				new IdentityRole(role));
+
+			if (!result.Succeeded)
+			{
+				var errors = string.Join(
+					", ",
+					result.Errors.Select(error => error.Description));
+
+				throw new InvalidOperationException(
+					$"'{role}' rolü oluþturulamadý: {errors}");
+			}
+		}
+	}
+}
+
 app.MapControllerRoute(
 	name: "default",
 	pattern: "{controller=Home}/{action=Index}/{id?}");
 
+app.MapRazorPages();
 app.Run();

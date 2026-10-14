@@ -1,0 +1,84 @@
+﻿@model List<TrafficPenaltyManagement.Web.ViewModels.UserRoleViewModel>
+
+@{
+    ViewData["Title"] = "Kullanıcı Yönetimi";
+    var roles = (string[])ViewBag.AllowedRoles;
+}
+
+<h2 class="mb-4">Kullanıcı ve Rol Yönetimi</h2>
+
+@if (TempData["SuccessMessage"] is string success)
+{
+    <div class="alert alert-success">@success</div>
+}
+
+@if (TempData["ErrorMessage"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="alert alert-info">
+    Her kullanıcıya bu ekrandan tek bir uygulama rolü atanır.
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Ad Soyad</th>
+                <th>E-posta</th>
+                <th>Mevcut Rol</th>
+                <th>Yeni Rol</th>
+                <th>İşlem</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>@user.FullName</td>
+                    <td>@user.Email</td>
+                    <td>@user.CurrentRole</td>
+                    <td>
+                        <form asp-action="AssignRole"
+                              method="post"
+                              class="d-flex gap-2">
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="userId"
+                                   value="@user.UserId" />
+
+                            <select name="selectedRole"
+                                    class="form-select"
+                                    required>
+                                @foreach (var role in roles)
+                                {
+                                    if (role == user.SelectedRole)
+                                    {
+                                        <option value="@role" selected>
+                                            @role
+                                        </option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@role">
+                                            @role
+                                        </option>
+                                    }
+                                }
+                            </select>
+
+                            <button type="submit"
+                                    class="btn btn-primary btn-sm">
+                                Ata
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>

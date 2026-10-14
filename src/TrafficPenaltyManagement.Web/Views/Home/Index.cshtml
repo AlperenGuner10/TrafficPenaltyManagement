@@ -1,8 +1,222 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using Microsoft.AspNetCore.Identity
+@using TrafficPenaltyManagement.Infrastructure.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Ana Sayfa";
+    var isSignedIn = SignInManager.IsSignedIn(User);
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="dashboard-hero mb-4">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-8">
+            <span class="hero-label">YÖNETİM PANELİ</span>
+
+            <h1 class="display-5 fw-bold mt-3 mb-3">
+                Trafik Cezası Yönetim Sistemi
+            </h1>
+
+            <p class="lead mb-4">
+                Araçlarınızı yönetin, trafik cezalarını takip edin ve
+                onay süreçlerini tek bir merkezden kontrol edin.
+            </p>
+
+            @if (isSignedIn)
+            {
+                <a asp-controller="TrafficPenalties"
+                   asp-action="Index"
+                   class="btn btn-light btn-lg me-2 mb-2">
+                    Ceza Kayıtlarını Gör
+                </a>
+
+                @if (User.IsInRole("Employee") || User.IsInRole("Admin"))
+                {
+                    <a asp-controller="TrafficPenalties"
+                       asp-action="Create"
+                       class="btn btn-outline-light btn-lg mb-2">
+                        + Yeni Ceza Oluştur
+                    </a>
+                }
+            }
+            else
+            {
+                <a asp-controller="Account"
+                   asp-action="Login"
+                   class="btn btn-light btn-lg">
+                    Sisteme Giriş Yap
+                </a>
+            }
+        </div>
+
+        <div class="col-lg-4 d-none d-lg-block">
+            <div class="hero-symbol">
+                <div class="hero-symbol-inner">
+                    <span>TRAFİK</span>
+                    <strong>YÖNETİMİ</strong>
+                    <span class="hero-symbol-line"></span>
+                    <span>GÜVENLİ • DÜZENLİ • TAKİP EDİLEBİLİR</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (isSignedIn)
+{
+    <div class="mb-4">
+        <h2 class="section-title">Hızlı Erişim</h2>
+        <p class="text-secondary">
+            Yetkinize uygun işlemlere buradan ulaşabilirsiniz.
+        </p>
+    </div>
+
+    <div class="row g-4 mb-5">
+
+        @if (User.IsInRole("Employee") || User.IsInRole("Admin"))
+        {
+            <div class="col-sm-6 col-xl-3">
+                <a asp-controller="Vehicles"
+                   asp-action="Index"
+                   class="dashboard-card">
+                    <div class="card-icon icon-blue">AR</div>
+                    <h5>Araç Yönetimi</h5>
+                    <p>Araçları, plakaları ve araç bilgilerini görüntüleyin.</p>
+                    <span class="card-link">Araçları Görüntüle →</span>
+                </a>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <a asp-controller="Vehicles"
+                   asp-action="Create"
+                   class="dashboard-card">
+                    <div class="card-icon icon-purple">+</div>
+                    <h5>Yeni Araç Ekle</h5>
+                    <p>Sisteme yeni bir araç kaydı oluşturun.</p>
+                    <span class="card-link">Araç Kaydı Oluştur →</span>
+                </a>
+            </div>
+
+            <div class="col-sm-6 col-xl-3">
+                <a asp-controller="TrafficPenalties"
+                   asp-action="Create"
+                   class="dashboard-card">
+                    <div class="card-icon icon-orange">CE</div>
+                    <h5>Ceza Oluştur</h5>
+                    <p>Yeni trafik cezası kaydı oluşturup onaya gönderin.</p>
+                    <span class="card-link">Yeni Ceza Oluştur →</span>
+                </a>
+            </div>
+        }
+
+        <div class="col-sm-6 col-xl-3">
+            <a asp-controller="TrafficPenalties"
+               asp-action="Index"
+               class="dashboard-card">
+                <div class="card-icon icon-green">TL</div>
+                <h5>Trafik Cezaları</h5>
+                <p>Ceza kayıtlarını ve mevcut durumlarını inceleyin.</p>
+                <span class="card-link">Kayıtları Görüntüle →</span>
+            </a>
+        </div>
+
+        @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
+        {
+            <div class="col-sm-6 col-xl-3">
+                <a asp-controller="TrafficPenalties"
+                   asp-action="ManagerQueue"
+                   class="dashboard-card">
+                    <div class="card-icon icon-orange">Y</div>
+                    <h5>Yönetici Onayları</h5>
+                    <p>Onay bekleyen cezaları inceleyin ve karar verin.</p>
+                    <span class="card-link">Onay Kuyruğuna Git →</span>
+                </a>
+            </div>
+        }
+
+        @if (User.IsInRole("Finance") || User.IsInRole("Admin"))
+        {
+            <div class="col-sm-6 col-xl-3">
+                <a asp-controller="TrafficPenalties"
+                   asp-action="FinanceQueue"
+                   class="dashboard-card">
+                    <div class="card-icon icon-green">F</div>
+                    <h5>Finans Onayları</h5>
+                    <p>Yönetici onayından geçen cezaları değerlendirin.</p>
+                    <span class="card-link">Finans Kuyruğuna Git →</span>
+                </a>
+            </div>
+        }
+
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="col-sm-6 col-xl-3">
+                <a asp-controller="Users"
+                   asp-action="Index"
+                   class="dashboard-card">
+                    <div class="card-icon icon-dark">K</div>
+                    <h5>Kullanıcı Yönetimi</h5>
+                    <p>Kullanıcıları ve sistem rollerini yönetin.</p>
+                    <span class="card-link">Kullanıcıları Yönet →</span>
+                </a>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="info-card">
+                <h5>Merkezi Yönetim</h5>
+                <p>Araç ve trafik cezası kayıtlarını tek noktadan takip edin.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-card">
+                <h5>Kontrollü Onay Süreci</h5>
+                <p>Ceza kayıtlarını tanımlı yönetici ve finans aşamalarından geçirin.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="info-card">
+                <h5>İşlem Geçmişi</h5>
+                <p>Onay ve ret işlemlerinin geçmişini kayıtlar üzerinden izleyin.</p>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="workflow-section mb-4">
+    <div class="mb-4">
+        <h2 class="section-title">Ceza Onay Süreci</h2>
+        <p class="text-secondary mb-0">
+            Trafik cezası kayıtlarının izlediği temel iş akışı.
+        </p>
+    </div>
+
+    <div class="row g-3 align-items-stretch">
+        <div class="col-md-4">
+            <div class="workflow-step">
+                <span class="step-number">01</span>
+                <h5>Ceza Kaydı</h5>
+                <p>Yetkili çalışan ceza bilgilerini girer ve onaya gönderir.</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="workflow-step">
+                <span class="step-number">02</span>
+                <h5>Yönetici Onayı</h5>
+                <p>Yönetici kaydı inceler, onaylar veya gerekçesiyle reddeder.</p>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="workflow-step">
+                <span class="step-number">03</span>
+                <h5>Finans Onayı</h5>
+                <p>Finans ekibi son değerlendirmeyi yapar ve süreci tamamlar.</p>
+            </div>
+        </div>
+    </div>
 </div>

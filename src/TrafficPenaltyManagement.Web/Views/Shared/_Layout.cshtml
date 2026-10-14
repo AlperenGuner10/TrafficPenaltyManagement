@@ -1,49 +1,220 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿@using Microsoft.AspNetCore.Identity
+@using TrafficPenaltyManagement.Infrastructure.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+
+<!DOCTYPE html>
+<html lang="tr">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - TrafficPenaltyManagement.Web</title>
+    <title>@ViewData["Title"] - Trafik Cezası Yönetimi</title>
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TrafficPenaltyManagement.Web.styles.css" asp-append-version="true" />
 </head>
+
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">TrafficPenaltyManagement.Web</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+
+                <a class="navbar-brand fw-bold"
+                   asp-controller="Home"
+                   asp-action="Index">
+                    Trafik Cezası Yönetimi
+                </a>
+
+                <button class="navbar-toggler"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#mainNavbar"
+                        aria-controls="mainNavbar"
+                        aria-expanded="false"
+                        aria-label="Menüyü aç veya kapat">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <div class="collapse navbar-collapse" id="mainNavbar">
+
+                    <!-- Sol taraftaki ana menüler -->
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link"
+                               asp-controller="Home"
+                               asp-action="Index">
+                                Ana Sayfa
+                            </a>
                         </li>
+
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="TrafficPenalties"
+                                   asp-action="Index">
+                                    Trafik Cezaları
+                                </a>
+                            </li>
+                        }
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Vehicles" ? "active" : "")"
+                               asp-controller="Vehicles"
+                               asp-action="Index">
+                                Araçlar
+                            </a>
                         </li>
+
+                        @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="TrafficPenalties"
+                                   asp-action="ManagerQueue">
+                                    Yönetici Onayları
+                                </a>
+                            </li>
+                        }
+
+                        @if (User.IsInRole("Finance") || User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="TrafficPenalties"
+                                   asp-action="FinanceQueue">
+                                    Finans Onayları
+                                </a>
+                            </li>
+                        }
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Users"
+                                   asp-action="Index">
+                                    Kullanıcı Yönetimi
+                                </a>
+                            </li>
+                        }
+
+                    </ul>
+
+                    <!-- Sağ taraftaki kullanıcı işlemleri -->
+                    <ul class="navbar-nav ms-auto align-items-lg-center">
+
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item me-lg-2">
+                                <div class="d-flex flex-column px-2">
+                                    <span class="small fw-semibold text-dark">
+                                        @User.Identity?.Name
+                                    </span>
+
+                                    <span class="small text-secondary">
+                                        @if (User.IsInRole("Admin"))
+                                        {
+                                            <text>Yönetici / Admin</text>
+                                        }
+                                        else if (User.IsInRole("Manager"))
+                                        {
+                                            <text>Birim Yöneticisi</text>
+                                        }
+                                        else if (User.IsInRole("Finance"))
+                                        {
+                                            <text>Finans Personeli</text>
+                                        }
+                                        else if (User.IsInRole("Employee"))
+                                        {
+                                            <text>Çalışan</text>
+                                        }
+                                    </span>
+                                </div>
+                            </li>
+
+                            <li class="nav-item">
+                                <form asp-controller="Account"
+                                      asp-action="Logout"
+                                      method="post"
+                                      class="d-inline">
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="btn btn-outline-danger btn-sm">
+                                        Çıkış Yap
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item me-lg-2">
+                                <a asp-controller="Account"
+                                   asp-action="Login"
+                                   class="nav-link">
+                                    Giriş Yap
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a asp-controller="Account"
+                                   asp-action="Register"
+                                   class="btn btn-primary btn-sm">
+                                    Kayıt Ol
+                                </a>
+                            </li>
+                        }
+
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
+
+            @if (TempData["SuccessMessage"] is string successMessage)
+            {
+                <div class="alert alert-success alert-dismissible fade show"
+                     role="alert">
+                    @successMessage
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Kapat"></button>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] is string errorMessage)
+            {
+                <div class="alert alert-danger alert-dismissible fade show"
+                     role="alert">
+                    @errorMessage
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="alert"
+                            aria-label="Kapat"></button>
+                </div>
+            }
+
             @RenderBody()
+
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - TrafficPenaltyManagement.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="border-top footer text-muted bg-white">
+        <div class="container py-2 d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span>&copy; @DateTime.Now.Year - Trafik Cezası Yönetimi</span>
+            <span>Kurumsal İşlem ve Onay Platformu</span>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -31,7 +31,7 @@
             </p>
 
             <small>
-                @lastRejection.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+                @lastRejection.CreatedDate.AddHours(3).ToString("dd.MM.yyyy HH:mm")
             </small>
         }
         else
@@ -54,7 +54,7 @@
 
             <dt class="col-sm-3">Ceza Tarihi</dt>
             <dd class="col-sm-9">
-                @penalty.PenaltyDate.ToString("dd.MM.yyyy")
+                @penalty.PenaltyDate.AddHours(3).ToString("dd.MM.yyyy")
             </dd>
 
             <dt class="col-sm-3">Açıklama</dt>
@@ -87,7 +87,7 @@
 
             <dt class="col-sm-3">Oluşturulma Tarihi</dt>
             <dd class="col-sm-9">
-                @penalty.CreatedDate.ToString("dd.MM.yyyy HH:mm")
+                @penalty.CreatedDate.AddHours(3).ToString("dd.MM.yyyy HH:mm")
             </dd>
         </dl>
     </div>
@@ -119,7 +119,7 @@ else
                 @foreach (var history in Model.ApprovalHistories)
                 {
                     <tr>
-                        <td>@history.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>@history.CreatedDate.AddHours(3).ToString("dd.MM.yyyy HH:mm")</td>
                         <td>@history.PerformedByFullName</td>
                         <td>
                             @switch (history.ActionType)

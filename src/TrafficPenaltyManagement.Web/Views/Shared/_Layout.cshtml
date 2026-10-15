@@ -58,13 +58,16 @@
                                 </a>
                             </li>
                         }
-                        <li class="nav-item">
-                            <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Vehicles" ? "active" : "")"
-                               asp-controller="Vehicles"
-                               asp-action="Index">
-                                Araçlar
-                            </a>
-                        </li>
+                        @if (SignInManager.IsSignedIn(User))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                   asp-controller="Vehicles"
+                                   asp-action="Index">
+                                    Araçlar
+                                </a>
+                            </li>
+                        }
 
                         @if (User.IsInRole("Manager") || User.IsInRole("Admin"))
                         {

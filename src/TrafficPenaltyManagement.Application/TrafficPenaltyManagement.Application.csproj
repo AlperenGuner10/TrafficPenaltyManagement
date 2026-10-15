@@ -10,8 +10,4 @@
     <ProjectReference Include="..\TrafficPenaltyManagement.Domain\TrafficPenaltyManagement.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Validators\" />
-  </ItemGroup>
-
 </Project>

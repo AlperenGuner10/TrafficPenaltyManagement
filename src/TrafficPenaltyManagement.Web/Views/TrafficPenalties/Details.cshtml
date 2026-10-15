@@ -143,8 +143,52 @@ else
                                     break;
                             }
                         </td>
-                        <td>@GetStatusText(history.PreviousStatus)</td>
-                        <td>@GetStatusText(history.NewStatus)</td>
+                        <td>
+                            @switch (history.PreviousStatus)
+                            {
+                                case PenaltyStatus.New:
+                                    <span>Yeni</span>
+                                    break;
+                                case PenaltyStatus.WaitingForManagerApproval:
+                                    <span>Yönetici Onayı Bekliyor</span>
+                                    break;
+                                case PenaltyStatus.WaitingForFinanceApproval:
+                                    <span>Finans Onayı Bekliyor</span>
+                                    break;
+                                case PenaltyStatus.Completed:
+                                    <span>Tamamlandı</span>
+                                    break;
+                                case PenaltyStatus.Rejected:
+                                    <span>Reddedildi</span>
+                                    break;
+                                default:
+                                    <span>@history.PreviousStatus</span>
+                                    break;
+                            }
+                        </td>
+                        <td>
+                            @switch (history.NewStatus)
+                            {
+                                case PenaltyStatus.New:
+                                    <span>Yeni</span>
+                                    break;
+                                case PenaltyStatus.WaitingForManagerApproval:
+                                    <span>Yönetici Onayı Bekliyor</span>
+                                    break;
+                                case PenaltyStatus.WaitingForFinanceApproval:
+                                    <span>Finans Onayı Bekliyor</span>
+                                    break;
+                                case PenaltyStatus.Completed:
+                                    <span>Tamamlandı</span>
+                                    break;
+                                case PenaltyStatus.Rejected:
+                                    <span>Reddedildi</span>
+                                    break;
+                                default:
+                                    <span>@history.NewStatus</span>
+                                    break;
+                            }
+                        </td>
                         <td>@history.Description</td>
                     </tr>
                 }

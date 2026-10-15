@@ -26,4 +26,8 @@
     <ProjectReference Include="..\TrafficPenaltyManagement.Infrastructure\TrafficPenaltyManagement.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
+
 </Project>
